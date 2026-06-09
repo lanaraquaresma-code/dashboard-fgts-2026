@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FGTS 2026 · Pró-Transporte · Painel Orçamentário</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+
+  <nav class="topbar">
+    <div class="tb-brand">
+      <div class="tb-logo">🚌</div>
+      <div>
+        <div class="tb-name">Pró-Transporte · Painel FGTS 2026</div>
+        <div class="tb-sub">IN nº 47/2026 · Somente exercício orçamentário 2026</div>
+      </div>
+    </div>
+    <div class="tb-meta">
+      <div class="chip">Limite <b id="limiteTop"></b></div>
+      <div class="chip">Executado <b id="executadoTop"></b></div>
+      <div class="chip">Saldo <b id="saldoTop"></b></div>
+      <div class="chip alert">⚠ SUDESTE: Consumo 154,9% do saldo</div>
+      <div class="chip">Base: <b id="dtTop"></b></div>
+      <button class="update-btn" onclick="document.getElementById('uModal').classList.add('open')">📋 Como Atualizar</button>
+      <button class="update-btn" onclick="abrirInstrucao()">⚡ Atualizar Dados</button>
+    </div>
+  </nav>
+
+  <!-- MODAL -->
+  <div class="modal-overlay" id="uModal">
+    <div class="modal">
+      <button class="modal-close" onclick="document.getElementById('uModal').classList.remove('open')">✕ Fechar</button>
+      <h2>🔄 Guia de Atualização do Dashboard</h2>
+      <div class="msub">Pró-Transporte · FGTS 2026 · Como manter os dados sincronizados</div>
+
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h4>Arquivo-base: BASE_FGTS_DASHBOARD.xlsx</h4>
+          <p>Este arquivo é a <b>única fonte de dados</b> do dashboard. Mantenha a estrutura exatamente como está — mesmas colunas, mesma aba "Planilha1". Atualize os valores sempre que houver novas contratações, portarias ou mudanças na fila A Contratar.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h4>Colunas para atualizar diariamente</h4>
+          <p>
+            <b>A CONTRATAR AVANÇAR / NOVO PAC</b> → quando entrar novo processo na fila<br>
+            <b>CONTRATADO EM 2026 AVANÇAR / NOVO PAC</b> → quando um contrato for assinado<br>
+            <b>SELEÇÃO A PUBLICAR</b> → quando uma portaria for publicada<br>
+            <b>VALOR EXECUTADO</b> → Contratado Avancar + Contratado Novo PAC<br>
+            <b>SALDO</b> → Limite − Valor Executado<br>
+            <b>COMPROMETIDO TOTAL</b> → A Contratar total (sem Seleção)<br>
+            <b>SALDO REAL FUTURO</b> → Saldo − Comprometido Total
+          </p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h4>Atualizar o dashboard via script Python</h4>
+          <p>Com o arquivo Excel atualizado, execute o script:</p>
+          <div class="code-block">python scripts/atualizar.py</div>
+          <p style="margin-top:8px">O script lê os dados e gera um novo <b>js/data.js</b> automaticamente.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <h4>Estrutura do projeto</h4>
+          <div class="code-block">📁 FGTS_NOVO/
+  📄 index.html           ← abre no navegador
+  📁 css/
+     📄 styles.css        ← visual do dashboard
+  📁 js/
+     📄 data.js           ← gerado pelo Python
+     📄 helpers.js        ← formatadores
+     📄 components.js     ← renderizadores
+     📄 main.js           ← inicialização
+  📁 data/
+     📄 BASE_FGTS.xlsx    ← planilha fonte
+  📁 scripts/
+     📄 atualizar.py      ← atualiza data.js</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <h4>Problema de delay entre sistemas de contratação</h4>
+          <p>Para resolver o problema de um sistema registrar a contratação e o outro não, vamos criar uma <b>coluna de conciliação</b> no arquivo base indicando a data de cada sistema e o status de sincronização. O dashboard vai exibir visualmente quando há divergência entre os sistemas — <b>isso é o próximo passo que podemos construir juntos.</b></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="main">
+
+    <div class="ribbon">
+      <span class="ribbon-icon">🚨</span>
+      <div id="alertasBox"></div>
+    </div>
+
+    <!-- ══ GAUGE GERAL ══ -->
+    <div class="sec">Consumo geral do orçamento 2026 — R$ 6,4 bi</div>
+    <div class="gauge-card" id="gaugeCard">
+
+      <!-- DONUT -->
+      <div class="gauge-left">
+        <svg class="donut-svg" viewBox="0 0 100 100">
+          <defs>
+            <linearGradient id="gExec" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%"   stop-color="#1d4ed8" />
+              <stop offset="100%" stop-color="#60a5fa" />
+            </linearGradient>
+          </defs>
+          <circle class="donut-bg"   cx="50" cy="50" r="38" />
+          <circle class="donut-exec" cx="50" cy="50" r="38" id="donutExec"
+            transform="rotate(-90 50 50)" stroke-dasharray="238.76" stroke-dashoffset="238.76" />
+          <circle class="donut-fila" cx="50" cy="50" r="28" id="donutFila"
+            transform="rotate(-90 50 50)" stroke-dasharray="175.93" stroke-dashoffset="175.93" />
+          <text class="donut-center-pct" id="donutPctTxt" x="50" y="47"
+            text-anchor="middle" dominant-baseline="middle">0%</text>
+          <text class="donut-center-lbl" x="50" y="60"
+            text-anchor="middle" dominant-baseline="middle">EXECUTADO</text>
+        </svg>
+        <div style="font-size:10px;font-family:var(--mono);color:var(--dim);text-align:center;line-height:1.5;">
+          Anel externo = executado<br>Anel interno = a contratar
+        </div>
+      </div>
+
+      <!-- CENTRO: BARRA SEGMENTADA -->
+      <div class="gauge-title-block">
+        <h3>Execução do Orçamento FGTS 2026</h3>
+        <p>Visão consolidada nacional · IN nº 47/2026 · Todas as regiões</p>
+        <div style="margin-top:16px;" class="seg-bar-wrap">
+          <div class="seg-bar-track">
+            <div class="seg-bar-exec"  id="segExec"  style="width:0%" data-label=""></div>
+            <div class="seg-bar-fila"  id="segFila"  style="width:0%" data-label=""></div>
+            <div class="seg-bar-saldo" id="segSaldo" data-label=""></div>
+          </div>
+          <div class="seg-bar-labels">
+            <span>R$ 0</span>
+            <span style="color:var(--blue-l);font-weight:600" id="lblExecMid"></span>
+            <span id="lblLimite"></span>
+          </div>
+        </div>
+        <div class="gauge-pills" id="gaugePills"></div>
+      </div>
+
+      <!-- DIREITA: NÚMERO GRANDE -->
+      <div class="gauge-right">
+        <div>
+          <div class="gauge-big-pct" id="gaugeGrandePct" style="color:#3b82f6">0%</div>
+          <div class="gauge-sub-lbl">do limite executado</div>
+        </div>
+        <div style="margin-top:12px;">
+          <div class="gauge-big-pct" style="font-size:28px;" id="gaugeGrandeSaldo"></div>
+          <div class="gauge-sub-lbl">saldo disponível</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- KPIs -->
+    <div class="sec">Posição orçamentária por região — exercício 2026</div>
+    <div class="kpi-grid" id="kpiGrid"></div>
+
+    <!-- BARS + TABLE -->
+    <div class="mid-grid">
+      <div class="card">
+        <h3>Uso e Demanda do Orçamento — por região</h3>
+        <div class="csub">Cada barra mostra quanto do orçamento já está comprometido e a pressão adicional da demanda futura.</div>
+        <div class="legend-row">
+          <div class="leg"><div class="leg-sq" style="background:#3b82f6"></div>Contratado Avancar</div>
+          <div class="leg"><div class="leg-sq" style="background:#22c55e"></div>Contratado Novo PAC</div>
+          <div class="leg"><div class="leg-sq" style="background:#f59e0b"></div>A Contratar</div>
+          <div class="leg"><div class="leg-sq" style="background:#a855f7"></div>Seleção a Publicar</div>
+          <div class="leg">
+            <div class="leg-sq" style="background:repeating-linear-gradient(45deg,#ef4444,#ef4444 2px,#7f1d1d 2px,#7f1d1d 4px)"></div>
+            Excesso
+          </div>
+        </div>
+        <div class="hbar-list" id="hbarList"></div>
+      </div>
+      <div class="card">
+        <h3>Execução orçamentária 2026</h3>
+        <div class="csub">Fonte: BASE_FGTS_DASHBOARD.xlsx · IN nº 47/2026</div>
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th>Região</th>
+              <th>Limite</th>
+              <th>Executado</th>
+              <th>Saldo</th>
+              <th>% Exec.</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="tBody"></tbody>
+          <tfoot id="tFoot"></tfoot>
+        </table>
+      </div>
+    </div>
+
+    <!-- FILA -->
+    <div class="sec">Fila "A Contratar" por região — nenhum processo pode ser perdido</div>
+    <div class="kpi-grid" id="filaGrid"></div>
+
+    <!-- REMAN -->
+    <div class="sec">Diagnóstico de remanejamento orçamentário</div>
+    <div class="bot-grid" id="remanGrid"></div>
+
+  </div>
+
+  <footer>
+    <span>Pró-Transporte · Dashboard FGTS 2026 · IN nº 47/2026 · Somente exercício 2026 · Fonte: BASE_FGTS_DASHBOARD.xlsx</span>
+    <span id="dtFoot"></span>
+  </footer>
+
+  <script src="js/data.js"></script>
+  <script src="js/helpers.js"></script>
+  <script src="js/components.js"></script>
+  <script src="js/main.js"></script>
+
+</body>
+
+</html>

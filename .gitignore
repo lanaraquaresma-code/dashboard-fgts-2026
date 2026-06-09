@@ -1,0 +1,19 @@
+# Dados sensíveis / pesados
+data/BASE_FGTS.xlsx
+data/*.xlsx
+~$*
+
+# Backups antigos
+Backup/
+Backup*/
+
+# OS
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.env
