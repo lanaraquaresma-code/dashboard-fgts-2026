@@ -1,4 +1,4 @@
-# 🏗️ Plano de Reestruturação — Dashboard FGTS 2026
+# 🏗️ Plano de Reestruturação — Dashboard FGTS 2026 -
 
 ## Diagnóstico do Problema Atual
 
