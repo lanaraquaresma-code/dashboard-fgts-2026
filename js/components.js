@@ -6,15 +6,15 @@ function renderTopbar() {
   const elExe = document.getElementById('executadoTop');
   const elSal = document.getElementById('saldoTop');
 
-  const limiteTotal    = DATA.regioes.reduce((s, r) => s + r.limite, 0);
+  const limiteTotal = DATA.regioes.reduce((s, r) => s + r.limite, 0);
   const executadoTotal = DATA.regioes.reduce((s, r) => s + r.executado, 0);
-  const saldoTotal     = limiteTotal - executadoTotal;
+  const saldoTotal = limiteTotal - executadoTotal;
 
   if (elLim) elLim.textContent = fmtR(limiteTotal);
   if (elExe) elExe.textContent = fmtR(executadoTotal);
   if (elSal) elSal.textContent = fmtR(saldoTotal);
 
-  document.getElementById('dtTop').textContent  = DATA.atualizado;
+  document.getElementById('dtTop').textContent = DATA.atualizado;
   document.getElementById('dtFoot').textContent =
     `Gerado em ${new Date().toLocaleDateString('pt-BR')} · Dados de ${DATA.atualizado}`;
 }
@@ -27,9 +27,9 @@ function abrirInstrucao() {
 function gerarAlertas() {
   const alertas = [];
   DATA.regioes.forEach(r => {
-    const fila  = (Number(r.a_avancar) || 0) + (Number(r.a_novopac) || 0) + (Number(r.selecao) || 0);
+    const fila = (Number(r.a_avancar) || 0) + (Number(r.a_novopac) || 0) + (Number(r.selecao) || 0);
     const saldo = Number(r.saldo) || 0;
-    const perc  = saldo > 0 ? (fila / saldo) * 100 : 0;
+    const perc = saldo > 0 ? (fila / saldo) * 100 : 0;
 
     if (perc > 120) {
       alertas.push(
@@ -59,14 +59,14 @@ function renderAlertas() {
 /* ── Gauge geral ── */
 function renderGauge() {
   const t = DATA.totais;
-  const limiteTotal  = t.limite;
-  const executado    = t.executado;
+  const limiteTotal = t.limite;
+  const executado = t.executado;
   const selecaoTotal = DATA.regioes.reduce((s, r) => s + (Number(r.selecao) || 0), 0);
-  const fila         = t.comprometido + selecaoTotal;
-  const saldo        = t.saldo;
+  const fila = t.comprometido + selecaoTotal;
+  const saldo = t.saldo;
 
-  const pctExec  = executado / limiteTotal * 100;
-  const pctFila  = Math.min(fila / limiteTotal * 100, 100 - pctExec);
+  const pctExec = executado / limiteTotal * 100;
+  const pctFila = Math.min(fila / limiteTotal * 100, 100 - pctExec);
   const pctSaldo = Math.max(0, 100 - pctExec - pctFila);
 
   const fR = v => {
@@ -75,13 +75,13 @@ function renderGauge() {
     return 'R$ ' + (v / 1e6).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + 'M';
   };
 
-  document.getElementById('gaugeGrandePct').textContent   = pctExec.toFixed(1) + '%';
+  document.getElementById('gaugeGrandePct').textContent = pctExec.toFixed(1) + '%';
   document.getElementById('gaugeGrandeSaldo').textContent = fR(saldo);
 
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
-      const segExec  = document.getElementById('segExec');
-      const segFila  = document.getElementById('segFila');
+      const segExec = document.getElementById('segExec');
+      const segFila = document.getElementById('segFila');
       const segSaldo = document.getElementById('segSaldo');
 
       segExec.style.width = pctExec + '%';
@@ -94,19 +94,19 @@ function renderGauge() {
   });
 
   document.getElementById('lblExecMid').textContent = fR(executado) + ' executado';
-  document.getElementById('lblLimite').textContent  = fR(limiteTotal) + ' (limite)';
+  document.getElementById('lblLimite').textContent = fR(limiteTotal) + ' (limite)';
 
-  const pipeline         = DATA.regioes.reduce((s, r) => s + (parseFloat(r.a_avancar) || 0) + (parseFloat(r.a_novopac) || 0), 0);
+  const pipeline = DATA.regioes.reduce((s, r) => s + (parseFloat(r.a_avancar) || 0) + (parseFloat(r.a_novopac) || 0), 0);
   const selecaoTotalLocal = DATA.regioes.reduce((s, r) => s + (parseFloat(r.selecao) || 0), 0);
-  const demandaTotal     = pipeline + selecaoTotalLocal;
+  const demandaTotal = pipeline + selecaoTotalLocal;
 
   const pillsEl = document.getElementById('gaugePills');
   pillsEl.innerHTML = '';
   [
-    { lbl: 'Executado',      val: fR(executado),         clr: '#60a5fa' },
-    { lbl: 'Pipeline Firme', val: fR(pipeline),           clr: '#fbbf24' },
-    { lbl: 'Pressão Futura', val: fR(selecaoTotalLocal),  clr: '#a78bfa' },
-    { lbl: 'Demanda Total',  val: fR(demandaTotal),       clr: '#ef4444' },
+    { lbl: 'Executado', val: fR(executado), clr: '#60a5fa' },
+    { lbl: 'Saldo Futuro', val: fR(pipeline), clr: '#fbbf24' },
+    { lbl: 'Seleção a Publicar', val: fR(selecaoTotalLocal), clr: '#a78bfa' },
+    { lbl: 'Demanda Total', val: fR(demandaTotal), clr: '#ef4444' },
   ].forEach(p => {
     const div = document.createElement('div');
     div.className = 'g-pill';
@@ -117,11 +117,11 @@ function renderGauge() {
   });
 
   // Donut
-  const C_outer   = 2 * Math.PI * 38;
-  const C_inner   = 2 * Math.PI * 28;
-  const offExec   = C_outer * (1 - pctExec / 100);
+  const C_outer = 2 * Math.PI * 38;
+  const C_inner = 2 * Math.PI * 28;
+  const offExec = C_outer * (1 - pctExec / 100);
   const pctFilaIn = Math.min(fila / limiteTotal * 100, 100);
-  const offFila   = C_inner * (1 - pctFilaIn / 100);
+  const offFila = C_inner * (1 - pctFilaIn / 100);
 
   document.getElementById('donutPctTxt').textContent = pctExec.toFixed(1) + '%';
 
@@ -137,15 +137,15 @@ function renderGauge() {
 function renderKPICards() {
   const kpiGrid = document.getElementById('kpiGrid');
   DATA.regioes.forEach(r => {
-    const a_total  = (Number(r.a_avancar) || 0) + (Number(r.a_novopac) || 0);
-    const fila     = r.a_avancar + r.a_novopac + r.selecao;
-    const ratio    = pct(fila, r.saldo);
-    const execPct  = pct(r.executado, r.limite);
+    const a_total = (Number(r.a_avancar) || 0) + (Number(r.a_novopac) || 0);
+    const fila = r.a_avancar + r.a_novopac + r.selecao;
+    const ratio = pct(fila, r.saldo);
+    const execPct = pct(r.executado, r.limite);
     const saldoFut = (Number(r.saldo) || 0) - (Number(fila) || 0);
-    const s        = statusOf(r);
-    const clr      = SCLR[s];
-    const C        = 2 * Math.PI * 15;
-    const off      = C * (1 - cl(ratio, 0, 100) / 100);
+    const s = statusOf(r);
+    const clr = SCLR[s];
+    const C = 2 * Math.PI * 15;
+    const off = C * (1 - cl(ratio, 0, 100) / 100);
 
     const d = document.createElement('div');
     d.className = `kpi-card s-${s}`;
@@ -181,15 +181,15 @@ function renderKPICards() {
 function renderStackedBars() {
   const hbarList = document.getElementById('hbarList');
   DATA.regioes.forEach(r => {
-    const L       = r.limite;
+    const L = r.limite;
     const a_total = (Number(r.a_avancar) || 0) + (Number(r.a_novopac) || 0);
-    const total   = r.executado + a_total + r.selecao;
-    const ov      = total > L;
+    const total = r.executado + a_total + r.selecao;
+    const ov = total > L;
     const deficit = total - L;
-    const norm    = v => ov ? cl(v / total * 100, 0, 100) : cl(v / L * 100, 0, 100);
-    const ovPct   = ov ? cl((total - L) / L * 100, 0, 20) : 0;
-    const s       = statusOf(r);
-    const clr     = SCLR[s];
+    const norm = v => ov ? cl(v / total * 100, 0, 100) : cl(v / L * 100, 0, 100);
+    const ovPct = ov ? cl((total - L) / L * 100, 0, 20) : 0;
+    const s = statusOf(r);
+    const clr = SCLR[s];
 
     const d = document.createElement('div');
     d.innerHTML = `
@@ -218,7 +218,7 @@ function renderStackedBars() {
 function renderTable() {
   const tBody = document.getElementById('tBody');
   DATA.regioes.forEach(r => {
-    const s  = statusOf(r);
+    const s = statusOf(r);
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td>${r.nome}</td>
@@ -251,11 +251,11 @@ function renderTable() {
 function renderFilaCards() {
   const filaGrid = document.getElementById('filaGrid');
   DATA.regioes.forEach(r => {
-    const a_total  = (Number(r.a_avancar) || 0) + (Number(r.a_novopac) || 0);
-    const fila     = a_total + r.selecao;
+    const a_total = (Number(r.a_avancar) || 0) + (Number(r.a_novopac) || 0);
+    const fila = a_total + r.selecao;
     const saldoFut = r.saldo - (r.a_avancar + r.a_novopac + r.selecao);
-    const s        = statusOf(r);
-    const clr      = SCLR[s];
+    const s = statusOf(r);
+    const clr = SCLR[s];
 
     const d = document.createElement('div');
     d.className = 'fila-card';
