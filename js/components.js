@@ -156,12 +156,19 @@ function renderKPICards() {
         <circle class="ring-fill" cx="18" cy="18" r="15" stroke="${clr}"
           stroke-dasharray="${C.toFixed(2)}" stroke-dashoffset="${off.toFixed(2)}"/>
       </svg></div>
-      <div class="kpi-pct" style="color:${clr}">${ratio.toFixed(1)}%</div>
-      <div class="kpi-lbl">comprometido</div>
-      <div style="margin-top:6px;">
-        <span style="font-size:14px;font-weight:700;color:#3b82f6">${Number(execPct || 0).toFixed(1)}%</span>
-        <span style="font-size:10px;color:var(--dim);margin-left:4px;">executado</span>
-      </div>
+      <div class="kpi-pct" style="color:#3b82f6">
+  ${Number(execPct || 0).toFixed(1)}%
+</div>
+<div class="kpi-lbl">executado</div>
+
+<div style="margin-top:6px;">
+  <span style="font-size:14px;font-weight:700;color:${clr}">
+    ${ratio.toFixed(1)}%
+  </span>
+  <span style="font-size:10px;color:var(--dim);margin-left:4px;">
+    comprometido
+  </span>
+</div>
       <div class="kpi-div"></div>
       <div class="kpi-rows">
         <div class="kpi-row"><span class="l">Limite 2026</span><span class="v">${fmtR(r.limite)}</span></div>
