@@ -104,7 +104,7 @@ function renderGauge() {
   pillsEl.innerHTML = '';
   [
     { lbl: 'Executado', val: fR(executado), clr: '#60a5fa' },
-    { lbl: 'Saldo Futuro', val: fR(pipeline), clr: '#fbbf24' },
+    { lbl: 'Saldo Final', val: fR(pipeline), clr: '#fbbf24' },
     { lbl: 'Seleção a Publicar', val: fR(selecaoTotalLocal), clr: '#a78bfa' },
     { lbl: 'Demanda Total', val: fR(demandaTotal), clr: '#ef4444' },
   ].forEach(p => {
