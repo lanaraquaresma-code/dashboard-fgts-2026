@@ -368,7 +368,7 @@ body {
 .kpi-row .v {
   font-size: 13px;
   font-family: var(--mono);
-  color: var(--text);
+  color: #374151;
   font-weight: 700;
 }
 
