@@ -368,8 +368,8 @@ body {
 .kpi-row .v {
   font-size: 13px;
   font-family: var(--mono);
-  color: red !important;
-  font-weight: 700;
+  color: #3a424d;
+  font-weight: 600;
 }
 
 .ov-chip {
